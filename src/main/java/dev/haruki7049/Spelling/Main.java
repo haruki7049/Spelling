@@ -8,7 +8,7 @@ public class Main extends GameApplication {
     protected void initSettings(GameSettings settings) {
         settings.setWidth(800);
         settings.setHeight(600);
-        settings.setTitle("BasicGameSample");
+        settings.setTitle("Spelling");
     }
 
     @Override
