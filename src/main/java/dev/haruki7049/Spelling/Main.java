@@ -4,22 +4,18 @@ import static com.almasb.fxgl.dsl.FXGL.*;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javafx.collections.FXCollections;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import com.almasb.fxgl.input.KeyTrigger;
+import com.almasb.fxgl.input.TriggerListener;
+import com.almasb.fxgl.logging.Logger;
+import javafx.beans.property.StringProperty;
 
 public class Main extends GameApplication {
 
-  private enum CustomEnum {
-    Value1,
-    VALUE2,
-    VALUE3
-  }
+  private StringProperty currentInput;
+  private static final String ALLOWED_CHARS =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -',.!?";
+  private static final int MAX_LENGTH = 20;
+  private final Logger log = Logger.get(Main.class);
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -29,128 +25,53 @@ public class Main extends GameApplication {
   }
 
   @Override
-  protected void initUI() {
-    Map<String, Runnable> dialogs = new LinkedHashMap<>();
+  protected void initInput() {
+    getInput()
+        .addTriggerListener(
+            new TriggerListener() {
+              @Override
+              protected void onKeyBegin(KeyTrigger keyTrigger) {
+                var code = keyTrigger.getKey();
 
-    dialogs.put("Message", () -> getDialogService().showMessageBox("This is a simple message box"));
+                boolean shift = getInput().isHeld(javafx.scene.input.KeyCode.SHIFT);
 
-    dialogs.put(
-        "Error", () -> getDialogService().showErrorBox("This is a scary error box!", () -> {}));
+                // 英数字キーのみ判定
+                if (code.isLetterKey()) {
+                  char c = code.getName().charAt(0);
+                  if (!shift) c = Character.toLowerCase(c);
+                  if (ALLOWED_CHARS.indexOf(c) != -1) {
+                    log.info("Accepted: " + c);
+                  }
+                } else if (code.isDigitKey()) {
+                  char c = code.getName().charAt(0);
+                  if (ALLOWED_CHARS.indexOf(c) != -1) {
+                    log.info("Accepted: " + c);
+                  }
+                }
 
-    dialogs.put(
-        "Choice with 1",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!", answer -> System.out.println("Chosen: " + answer), "Hello"));
-    dialogs.put(
-        "Choice with 2",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!",
-                    answer -> System.out.println("Chosen: " + answer),
-                    "Hello",
-                    "World"));
-    dialogs.put(
-        "Choice with 3",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!",
-                    answer -> System.out.println("Chosen: " + answer),
-                    "Hello",
-                    "World",
-                    "FXGL"));
-    dialogs.put(
-        "Choice with 4",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!",
-                    answer -> System.out.println("Chosen: " + answer),
-                    "Hello",
-                    "World",
-                    "FXGL",
-                    "JavaFX"));
+                // 記号・スペース類
+                else {
+                  switch (code) {
+                    case SPACE -> logIfAllowed(" ");
+                    case COMMA -> logIfAllowed(",");
+                    case PERIOD -> logIfAllowed(".");
+                    case QUOTE -> logIfAllowed("'");
+                    case MINUS -> logIfAllowed("-");
+                    case DIGIT1 -> {
+                      if (shift) logIfAllowed("!");
+                    }
+                    case SLASH -> {
+                      if (shift) logIfAllowed("?");
+                    }
+                  }
+                }
+              }
 
-    dialogs.put(
-        "Choice with List",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!",
-                    List.of("Item1", "Item2"),
-                    answer -> System.out.println("Chosen: " + answer)));
-
-    dialogs.put(
-        "Choice with Enum",
-        () ->
-            getDialogService()
-                .showChoiceBox(
-                    "Choose wisely!",
-                    CustomEnum.class,
-                    answer -> System.out.println("Chosen: " + answer)));
-
-    dialogs.put(
-        "Confirmation",
-        () ->
-            getDialogService()
-                .showConfirmationBox(
-                    "This is a confirmation box. Agree?",
-                    answer -> System.out.println("You pressed yes? " + answer)));
-
-    dialogs.put(
-        "Input",
-        () ->
-            getDialogService()
-                .showInputBox(
-                    "This is an input box. You can type stuff...",
-                    answer -> System.out.println("You typed: " + answer)));
-
-    dialogs.put(
-        "Custom",
-        () -> {
-          VBox content =
-              new VBox(
-                  getUIFactoryService().newText("Line 1"),
-                  getUIFactoryService().newText("Line 2"),
-                  getAssetLoader().loadTexture("brick.png"),
-                  getUIFactoryService().newText("Line 3"),
-                  getUIFactoryService().newText("Line 4"));
-
-          Button btnClose = getUIFactoryService().newButton("Press me to close");
-          btnClose.setPrefWidth(300);
-
-          getDialogService().showBox("This is a customizable box", content, btnClose);
-        });
-
-    ChoiceBox<String> cbDialogs =
-        getUIFactoryService().newChoiceBox(FXCollections.observableArrayList(dialogs.keySet()));
-
-    cbDialogs.getSelectionModel().selectFirst();
-
-    Button btn = getUIFactoryService().newButton("Open");
-    btn.setOnAction(
-        e -> {
-          String dialogType = cbDialogs.getSelectionModel().getSelectedItem();
-          if (dialogs.containsKey(dialogType)) {
-            dialogs.get(dialogType).run();
-          } else {
-            System.out.println("Unknown dialog type");
-          }
-        });
-
-    VBox vbox = new VBox(10);
-    vbox.setTranslateX(600);
-    vbox.getChildren()
-        .addAll(getUIFactoryService().newText("Dialog Types", Color.BLACK, 18), cbDialogs, btn);
-
-    getGameScene().addUINode(vbox);
+              private void logIfAllowed(String s) {
+                if (ALLOWED_CHARS.contains(s)) log.info("Accepted: " + s);
+              }
+            });
   }
-
-  @Override
-  protected void initGame() {}
 
   public static void main(String[] args) {
     launch(args);
