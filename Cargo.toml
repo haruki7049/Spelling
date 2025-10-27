@@ -11,3 +11,4 @@ repository = "https://github.com/haruki7049/Spelling"
 
 [dependencies]
 bevy = "0.17.2"
+bevy_simple_text_input = "0.12.0"
