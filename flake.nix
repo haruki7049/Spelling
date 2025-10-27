@@ -76,7 +76,7 @@
             LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
             LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
           };
-          spacerobo = craneLib.buildPackage {
+          spelling = craneLib.buildPackage {
             inherit
               src
               cargoArtifacts
@@ -97,13 +97,13 @@
               echo "Copy assets"
               cp -r assets $out/bin
 
-              wrapProgram $out/bin/spacerobo \
+              wrapProgram $out/bin/spelling \
                 --set LD_LIBRARY_PATH ${lib.makeLibraryPath buildInputs}
             '';
 
             meta = {
               licenses = [ lib.licenses.mit ];
-              mainProgram = "spacerobo";
+              mainProgram = "spelling";
             };
           };
           cargo-clippy = craneLib.cargoClippy {
@@ -160,8 +160,8 @@
           };
 
           packages = {
-            inherit spacerobo;
-            default = spacerobo;
+            inherit spelling;
+            default = spelling;
             doc = cargo-doc;
           };
 
