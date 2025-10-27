@@ -1,0 +1,1 @@
+# Spelling's assets directory
