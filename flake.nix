@@ -1,4 +1,11 @@
 {
+  nixConfig = {
+    extra-substituters = [ "https://spelling.cachix.org" ];
+    extra-trusted-public-keys = [
+      "spelling.cachix.org-1:eHw0At75VldK+6XF499P/MqOeM2ARf+ladQK3dEOsFY="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
@@ -69,6 +76,12 @@
             # Linker
             pkgs.llvmPackages.clang
             pkgs.llvmPackages.lld
+
+            # Cachix
+            pkgs.cachix
+
+            # Script runner
+            pkgs.nushell
           ];
           cargoArtifacts = craneLib.buildDepsOnly {
             inherit src buildInputs nativeBuildInputs;
