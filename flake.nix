@@ -77,6 +77,9 @@
 
             # Cachix
             pkgs.cachix
+
+            # Script runner
+            pkgs.nushell
           ];
           cargoArtifacts = craneLib.buildDepsOnly {
             inherit src buildInputs nativeBuildInputs;
