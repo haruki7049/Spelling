@@ -1,7 +1,9 @@
 {
   nixConfig = {
     extra-substituters = [ "https://spelling.cachix.org" ];
-    extra-trusted-public-keys = [ "spelling.cachix.org-1:eHw0At75VldK+6XF499P/MqOeM2ARf+ladQK3dEOsFY=" ];
+    extra-trusted-public-keys = [
+      "spelling.cachix.org-1:eHw0At75VldK+6XF499P/MqOeM2ARf+ladQK3dEOsFY="
+    ];
   };
 
   inputs = {
