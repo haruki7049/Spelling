@@ -1,11 +1,27 @@
 mod common_syntaxes {
-    use lat::{LatValue, parse};
+    use lat::{
+        parser::parse,
+        types::{Action, Element, LatValue, Modifier},
+    };
 
     #[test]
-    fn test() {
-        const INPUT: &str = "";
-        let parsed_result: LatValue = parse(INPUT);
+    fn test() -> Result<(), Box<dyn std::error::Error>> {
+        const INPUT: &str = "Ure ignis magno";
+        let parsed_result: LatValue = parse(INPUT)?;
 
-        assert_eq!(parsed_result, LatValue {});
+        assert_eq!(
+            parsed_result,
+            LatValue {
+                action: Action::Ure,
+                element: Element::Ignis,
+                modifier: Modifier::Magnus,
+                target: None,
+                origin: None,
+                emphasis_phrases: vec![],
+                source_text: String::from("Ure ignis magno"),
+            }
+        );
+
+        Ok(())
     }
 }

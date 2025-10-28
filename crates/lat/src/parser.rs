@@ -1,5 +1,5 @@
-use crate::LatValue;
+use crate::types::{LatValue, errors::LatError};
 
-pub fn parse(_input: &str) -> LatValue {
-    LatValue {}
+pub fn parse(_input: &str) -> Result<LatValue, LatError> {
+    Err(LatError::UnexpectedEof)
 }
