@@ -44,10 +44,10 @@ jobs:
 
       # cargo-build, cargo-test, cargo-check, and cargo-clippy
       - name: Run build
-        run: cargo build --verbose
+        run: cargo build --workspace
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test --workspace
       - name: Run check
-        run: cargo check --verbose
+        run: cargo check --workspace
       - name: Run clippy
-        run: cargo clippy --verbose
+        run: cargo clippy --workspace
