@@ -1,10 +1,10 @@
-name: Rust
+name: Rust from rustup
 
 on:
   push:
 
 jobs:
-  setup:
+  ci:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
