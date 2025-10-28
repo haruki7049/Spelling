@@ -74,6 +74,9 @@
             # Linker
             pkgs.llvmPackages.clang
             pkgs.llvmPackages.lld
+
+            # Cachix
+            pkgs.cachix
           ];
           cargoArtifacts = craneLib.buildDepsOnly {
             inherit src buildInputs nativeBuildInputs;
