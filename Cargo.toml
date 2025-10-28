@@ -29,6 +29,9 @@ members = [
   "crates/lat",
 ]
 
+[workspace.dependencies]
+nom = "8.0.0"
+
 [dependencies]
 bevy = "0.17.2"
 bevy_simple_text_input = "0.12.0"
