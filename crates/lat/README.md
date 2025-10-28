@@ -11,9 +11,10 @@ ______________________________________________________________________
 The primary API is the `lat::parse` function, which takes a string slice and returns a `Result<LatValue, LatError>`.
 
 ```rust
-use lat::{
-    parse, LatValue, LatError, 
-    Action, Element, Modifier, Target, Origin, Emphasis, CoreComponent
+use lat::parser::parse;
+use lat::types::{
+    LatValue, Action, Element, Modifier, Target, Origin, Emphasis, CoreComponent,
+    errors::LatError,
 };
 
 fn main() {
