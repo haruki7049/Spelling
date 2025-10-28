@@ -17,5 +17,5 @@ nix flake archive --json
 print "Pushing runtime closure..."
 print
 
-nix build --no-link --print-out-paths .#spelling -L
+nix build --no-link --print-out-paths .#spelling
   | cachix push spelling
