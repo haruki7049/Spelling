@@ -11,14 +11,10 @@ debug/
 
 # Nix's result
 result
+result-*
 
 # Direnv's dotfiles
 .direnv/
 
 # cargo-llvm-cov's result
 coverage/
-
-
-# Added by cargo
-
-/target
