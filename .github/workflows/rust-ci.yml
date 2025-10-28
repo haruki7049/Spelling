@@ -18,13 +18,7 @@ jobs:
           toolchain: 1.90.0
           components: clippy
 
-  build-test-check-clippy:
-    needs: setup
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
+      # cargo-build, cargo-test, cargo-check, and cargo-clippy
       - name: Run build
         run: cargo build --verbose
       - name: Run tests
