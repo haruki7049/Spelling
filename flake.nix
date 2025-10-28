@@ -102,6 +102,8 @@
             LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
             LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 
+            cargoExtraArgs = "--locked --workspace";
+
             installPhaseCommand = ''
               echo "actually installing contents of $postBuildInstallFromCargoBuildLogOut to $out"
               mkdir -p $out
