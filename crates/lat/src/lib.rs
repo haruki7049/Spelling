@@ -1,5 +1,14 @@
-mod parser;
-mod types;
+wit_bindgen::generate!({
+    world: "lat",
+});
 
-pub use parser::parse;
-pub use types::LatValue;
+pub struct Lat;
+
+impl Guest for Lat {
+    fn parse(inputs: String) -> Result<LatValue, ParseError> {
+        dbg!(inputs);
+        todo!();
+    }
+}
+
+export!(Lat);

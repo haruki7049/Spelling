@@ -1,0 +1,31 @@
+package haruki7049:lat;
+
+world lat {
+    use types.{lat-value, parse-error};
+
+    export parse: func(inputs: string) -> result<lat-value, parse-error>;
+}
+
+interface types {
+    record position {
+        line: u32,
+        column: u32,
+    }
+
+    variant error-source {
+        unexpected-token(string),
+        invalid-syntax(string),
+        end-of-input,
+        custom(string),
+    }
+
+    record parse-error {
+        value: string,
+        pos: position,
+        message: string,
+    }
+
+    record lat-value {
+        value: string,
+    }
+}
