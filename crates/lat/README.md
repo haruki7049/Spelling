@@ -1,1 +1,0 @@
-# lat language for Spelling

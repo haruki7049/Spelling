@@ -1,5 +1,6 @@
 [package]
 name = "lat"
+description = "A default implementation for lat"
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
@@ -9,4 +10,12 @@ publish.workspace = true
 readme.workspace = true
 
 [dependencies]
-nom.workspace = true
+wit-bindgen.workspace = true
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[package.metadata.component]
+package = "haruki7049:lat"
+
+[package.metadata.component.dependencies]
