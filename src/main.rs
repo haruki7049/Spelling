@@ -133,7 +133,9 @@ fn listener(
     mut resetter: MessageWriter<ResetMessage>,
 ) {
     for event in events.read() {
-        if let Ok(result) = Lat::parse(event.value.clone()) && result.resetting {
+        if let Ok(result) = Lat::parse(event.value.clone())
+            && result.resetting
+        {
             resetter.write(ResetMessage);
         }
     }
