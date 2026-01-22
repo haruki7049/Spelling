@@ -25,8 +25,10 @@ mod tests {
 
     #[test]
     fn lat_parse() {
-        let inputs: String = "HELLO".to_string();
+        let not_reset_str: String = "HELLO".to_string();
+        assert_eq!(Lat::parse(not_reset_str.clone()), Ok(LatValue::new(false)));
 
-        assert_eq!(Lat::parse(inputs.clone()), Ok(LatValue::new(inputs)));
+        let reset_str: String = "reset".to_string();
+        assert_eq!(Lat::parse(reset_str.clone()), Ok(LatValue::new(true)));
     }
 }
