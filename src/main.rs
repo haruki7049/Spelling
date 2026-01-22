@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
     let container: LatContainer = {
         let engine = wasmtime::Engine::default();
         let component =
-            wasmtime::component::Component::from_file(&engine, &args.wasm_path.unwrap())?;
+            wasmtime::component::Component::from_file(&engine, args.wasm_path.unwrap())?;
 
         let mut linker = wasmtime::component::Linker::new(&engine);
         lat::Lat::add_to_linker::<_, wasmtime::component::HasSelf<_>>(&mut linker, |state| state)?;
