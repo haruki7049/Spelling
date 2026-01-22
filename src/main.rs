@@ -7,15 +7,22 @@ use bevy_simple_text_input::{
     TextInputTextFont,
 };
 use lat::{Guest, Lat};
+use clap::Parser as _;
 
-#[derive(Component)]
-struct SandboxEntity;
-
-const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
-const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BACKGROUND_COLOR: Color = Color::srgb(0.15, 0.15, 0.15);
+#[derive(clap::Parser)]
+#[command(about, author, version)]
+struct CLIArgs {
+    #[arg(long)]
+    wasm_path: Option<std::path::PathBuf>,
+}
 
 fn main() {
+    let args = CLIArgs::parse();
+
+    if args.wasm_path.is_none() {
+        panic!("WASM_PATH IS NONE");
+    }
+
     App::new()
         .add_plugins((
             DefaultPlugins.set(WindowPlugin {
@@ -36,6 +43,16 @@ fn main() {
         .add_systems(Update, reset)
         .run();
 }
+
+fn load_lat_parse(path: std::path::PathBuf) -> wasmtime::compnent::TypedFunc<(String,), Result<lat::LatValue, lat::ParseError>> {
+}
+
+#[derive(Component)]
+struct SandboxEntity;
+
+const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
+const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const BACKGROUND_COLOR: Color = Color::srgb(0.15, 0.15, 0.15);
 
 fn setup(
     mut commands: Commands,
