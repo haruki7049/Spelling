@@ -42,7 +42,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn((Camera2d::default(),));
+    commands.spawn(Camera2d);
 
     commands
         .spawn(Node {
