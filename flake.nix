@@ -82,6 +82,9 @@
 
             # Script runner
             pkgs.nushell
+
+            # Wasm
+            pkgs.wasm-tools
           ];
           cargoArtifacts = craneLib.buildDepsOnly {
             inherit src buildInputs nativeBuildInputs;
