@@ -2,11 +2,11 @@
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use lat::{Lat, Guest};
 use bevy_simple_text_input::{
     TextInput, TextInputPlugin, TextInputSubmitMessage, TextInputSystem, TextInputTextColor,
     TextInputTextFont,
 };
+use lat::{Guest, Lat};
 
 const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
 const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
