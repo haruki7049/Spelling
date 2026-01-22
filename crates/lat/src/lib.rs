@@ -8,7 +8,8 @@ unsafe impl std::marker::Send for Lat {}
 impl bevy::ecs::resource::Resource for Lat {}
 impl bevy::ecs::component::Component for Lat {
     type Mutability = bevy::ecs::component::Mutable;
-    const STORAGE_TYPE: bevy::ecs::component::StorageType = bevy::ecs::component::StorageType::Table;
+    const STORAGE_TYPE: bevy::ecs::component::StorageType =
+        bevy::ecs::component::StorageType::Table;
 }
 
-pub use haruki7049::lat::types::{ParseError, LatValue};
+pub use haruki7049::lat::types::{LatValue, ParseError};

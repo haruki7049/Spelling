@@ -6,8 +6,8 @@ use bevy_simple_text_input::{
     TextInput, TextInputPlugin, TextInputSubmitMessage, TextInputSystem, TextInputTextColor,
     TextInputTextFont,
 };
-use lat::Lat;
 use clap::Parser as _;
+use lat::Lat;
 
 #[derive(clap::Parser)]
 #[command(about, author, version)]
@@ -31,15 +31,13 @@ fn main() -> anyhow::Result<()> {
 
     let container: LatContainer = {
         let engine = wasmtime::Engine::default();
-        let component = wasmtime::component::Component::from_file(&engine, &args.wasm_path.unwrap())?;
+        let component =
+            wasmtime::component::Component::from_file(&engine, &args.wasm_path.unwrap())?;
 
         let mut linker = wasmtime::component::Linker::new(&engine);
         lat::Lat::add_to_linker::<_, wasmtime::component::HasSelf<_>>(&mut linker, |state| state)?;
 
-        let mut store = wasmtime::Store::new(
-            &engine,
-            WasmState(),
-        );
+        let mut store = wasmtime::Store::new(&engine, WasmState());
 
         let instance = Lat::instantiate(&mut store, &component, &linker)?;
 
@@ -176,7 +174,10 @@ fn listener(
     let LatContainer { store, instance } = &mut *container;
 
     for event in events.read() {
-        match instance.haruki7049_lat_parser().call_parse(&mut *store, &event.value) {
+        match instance
+            .haruki7049_lat_parser()
+            .call_parse(&mut *store, &event.value)
+        {
             Ok(Ok(result)) => {
                 if result.resetting {
                     resetter.write(ResetMessage);
