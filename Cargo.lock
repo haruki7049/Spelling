@@ -4709,6 +4709,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
+name = "only-reset"
+version = "0.1.0"
+dependencies = [
+ "wit-bindgen",
+]
+
+[[package]]
 name = "orbclient"
 version = "0.3.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5761,13 +5768,6 @@ dependencies = [
  "lat",
  "wasmtime",
  "wasmtime-wasi",
-]
-
-[[package]]
-name = "spelling-haruki7049-spells"
-version = "0.1.0"
-dependencies = [
- "wit-bindgen",
 ]
 
 [[package]]
