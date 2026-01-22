@@ -16,11 +16,31 @@ struct CLIArgs {
     wasm_path: Option<std::path::PathBuf>,
 }
 
-struct WasmState();
+struct WasmState {
+    wasi_ctx: wasmtime_wasi::WasiCtx,
+    resource_table: wasmtime_wasi::ResourceTable,
+}
+
+impl wasmtime_wasi::WasiView for WasmState {
+    fn ctx(&mut self) -> wasmtime_wasi::WasiCtxView<'_> {
+        wasmtime_wasi::WasiCtxView{
+            ctx: &mut self.wasi_ctx,
+            table: &mut self.resource_table,
+        }
+    }
+}
+
+impl Default for WasmState {
+    fn default() -> Self {
+        let wasi_ctx = wasmtime_wasi::WasiCtxBuilder::new().inherit_stdio().build();
+        let resource_table = wasmtime_wasi::ResourceTable::default();
+
+        Self { wasi_ctx, resource_table }
+    }
+}
 
 impl lat::haruki7049::lat::types::Host for WasmState {}
 
-#[derive(Resource)]
 struct LatContainer {
     store: wasmtime::Store<WasmState>,
     instance: lat::Lat,
@@ -30,14 +50,17 @@ fn main() -> anyhow::Result<()> {
     let args = CLIArgs::parse();
 
     let container: LatContainer = {
-        let engine = wasmtime::Engine::default();
+        let mut config = wasmtime::Config::default();
+
+        let engine = wasmtime::Engine::new(&config)?;
         let component =
             wasmtime::component::Component::from_file(&engine, args.wasm_path.unwrap())?;
 
         let mut linker = wasmtime::component::Linker::new(&engine);
+        wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
         lat::Lat::add_to_linker::<_, wasmtime::component::HasSelf<_>>(&mut linker, |state| state)?;
 
-        let mut store = wasmtime::Store::new(&engine, WasmState());
+        let mut store = wasmtime::Store::new(&engine, WasmState::default());
 
         let instance = Lat::instantiate(&mut store, &component, &linker)?;
 
@@ -62,7 +85,7 @@ fn main() -> anyhow::Result<()> {
         .add_systems(Startup, setup)
         .add_systems(Update, (listener.after(TextInputSystem), update_boundaries))
         .add_systems(Update, reset)
-        .insert_resource(container)
+        .insert_non_send_resource(container)
         .run();
 
     Ok(())
@@ -169,7 +192,7 @@ fn update_boundaries(windows: Query<&Window>, mut query: Query<&mut Collider, Wi
 fn listener(
     mut events: MessageReader<TextInputSubmitMessage>,
     mut resetter: MessageWriter<ResetMessage>,
-    mut container: ResMut<LatContainer>,
+    mut container: NonSendMut<LatContainer>,
 ) {
     let LatContainer { store, instance } = &mut *container;
 

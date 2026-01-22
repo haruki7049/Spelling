@@ -47,3 +47,4 @@ lat.workspace = true
 clap.workspace = true
 wasmtime.workspace = true
 anyhow.workspace = true
+wasmtime-wasi = "41.0.0"
