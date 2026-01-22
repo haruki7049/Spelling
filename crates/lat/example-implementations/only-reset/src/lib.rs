@@ -7,7 +7,9 @@ wit_bindgen::generate!({
 struct MyLat;
 
 impl exports::haruki7049::lat::parser::Guest for MyLat {
-    fn parse(inputs: String) -> Result<haruki7049::lat::types::LatValue, haruki7049::lat::types::ParseError> {
+    fn parse(
+        inputs: String,
+    ) -> Result<haruki7049::lat::types::LatValue, haruki7049::lat::types::ParseError> {
         if inputs == "reset" {
             Ok(haruki7049::lat::types::LatValue { resetting: true })
         } else if inputs.is_empty() {

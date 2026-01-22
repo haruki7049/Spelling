@@ -23,7 +23,7 @@ struct WasmState {
 
 impl wasmtime_wasi::WasiView for WasmState {
     fn ctx(&mut self) -> wasmtime_wasi::WasiCtxView<'_> {
-        wasmtime_wasi::WasiCtxView{
+        wasmtime_wasi::WasiCtxView {
             ctx: &mut self.wasi_ctx,
             table: &mut self.resource_table,
         }
@@ -35,7 +35,10 @@ impl Default for WasmState {
         let wasi_ctx = wasmtime_wasi::WasiCtxBuilder::new().inherit_stdio().build();
         let resource_table = wasmtime_wasi::ResourceTable::default();
 
-        Self { wasi_ctx, resource_table }
+        Self {
+            wasi_ctx,
+            resource_table,
+        }
     }
 }
 
