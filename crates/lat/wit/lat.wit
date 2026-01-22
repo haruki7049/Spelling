@@ -26,6 +26,6 @@ interface types {
     }
 
     record lat-value {
-        value: string,
+        resetting: bool,
     }
 }

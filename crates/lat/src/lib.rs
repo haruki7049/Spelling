@@ -7,13 +7,13 @@ pub struct Lat;
 
 impl Guest for Lat {
     fn parse(inputs: String) -> Result<LatValue, ParseError> {
-        Ok(LatValue::new(inputs))
+        Ok(LatValue::new(inputs == "reset"))
     }
 }
 
 impl LatValue {
-    pub fn new(value: String) -> Self {
-        Self { value }
+    pub fn new(resetting: bool) -> Self {
+        Self { resetting }
     }
 }
 

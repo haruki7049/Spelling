@@ -2,6 +2,7 @@
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use lat::{Lat, Guest};
 use bevy_simple_text_input::{
     TextInput, TextInputPlugin, TextInputSubmitMessage, TextInputSystem, TextInputTextColor,
     TextInputTextFont,
@@ -122,6 +123,8 @@ fn update_boundaries(windows: Query<&Window>, mut query: Query<&mut Collider, Wi
 
 fn listener(mut events: MessageReader<TextInputSubmitMessage>) {
     for event in events.read() {
-        info!("{:?} submitted: {}", event.entity, event.value);
+        if let Ok(result) = Lat::parse(event.value.clone()) {
+            info!("result.resetting = {}", result.resetting);
+        }
     }
 }

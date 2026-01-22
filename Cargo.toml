@@ -30,6 +30,7 @@ members = [
 ]
 
 [workspace.dependencies]
+lat.path = "crates/lat"
 nom = "8.0.0"
 bevy = "0.18.0"
 bevy_simple_text_input = "0.13.0"
@@ -40,3 +41,4 @@ avian2d = "0.5.0"
 avian2d.workspace = true
 bevy.workspace = true
 bevy_simple_text_input.workspace = true
+lat.workspace = true

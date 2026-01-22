@@ -13,7 +13,7 @@ readme.workspace = true
 wit-bindgen.workspace = true
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["rlib", "cdylib"]
 
 [package.metadata.component]
 package = "haruki7049:lat"
