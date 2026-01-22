@@ -34,9 +34,10 @@ lat.path = "crates/lat"
 nom = "8.0.0"
 bevy = "0.18.0"
 bevy_simple_text_input = "0.13.0"
-wit-bindgen = "0.51.0"
 avian2d = "0.5.0"
 clap = { version = "4.5.54", features = ["derive"] }
+wasmtime = "41.0.0"
+anyhow = "1.0.100"
 
 [dependencies]
 avian2d.workspace = true
@@ -44,3 +45,5 @@ bevy.workspace = true
 bevy_simple_text_input.workspace = true
 lat.workspace = true
 clap.workspace = true
+wasmtime.workspace = true
+anyhow.workspace = true

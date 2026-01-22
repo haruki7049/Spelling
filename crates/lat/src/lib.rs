@@ -1,34 +1,14 @@
-wit_bindgen::generate!({
+wasmtime::component::bindgen!({
     world: "lat",
-    additional_derives: [PartialEq, Eq, Hash, Clone],
+    additional_derives: [Clone],
 });
 
-pub struct Lat;
-
-impl Guest for Lat {
-    fn parse(inputs: String) -> Result<LatValue, ParseError> {
-        Ok(LatValue::new(inputs == "reset"))
-    }
+unsafe impl std::marker::Sync for Lat {}
+unsafe impl std::marker::Send for Lat {}
+impl bevy::ecs::resource::Resource for Lat {}
+impl bevy::ecs::component::Component for Lat {
+    type Mutability = bevy::ecs::component::Mutable;
+    const STORAGE_TYPE: bevy::ecs::component::StorageType = bevy::ecs::component::StorageType::Table;
 }
 
-impl LatValue {
-    pub fn new(resetting: bool) -> Self {
-        Self { resetting }
-    }
-}
-
-export!(Lat);
-
-#[cfg(test)]
-mod tests {
-    use super::{Guest, Lat, LatValue};
-
-    #[test]
-    fn lat_parse() {
-        let not_reset_str: String = "HELLO".to_string();
-        assert_eq!(Lat::parse(not_reset_str.clone()), Ok(LatValue::new(false)));
-
-        let reset_str: String = "reset".to_string();
-        assert_eq!(Lat::parse(reset_str.clone()), Ok(LatValue::new(true)));
-    }
-}
+pub use haruki7049::lat::types::{ParseError, LatValue};

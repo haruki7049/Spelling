@@ -10,7 +10,8 @@ publish.workspace = true
 readme.workspace = true
 
 [dependencies]
-wit-bindgen.workspace = true
+wasmtime.workspace = true
+bevy.workspace = true
 
 [lib]
 crate-type = ["rlib", "cdylib"]

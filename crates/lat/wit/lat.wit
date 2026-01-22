@@ -1,9 +1,14 @@
 package haruki7049:lat;
 
 world lat {
+    export parser;
+    import types;
+}
+
+interface parser {
     use types.{lat-value, parse-error};
 
-    export parse: func(inputs: string) -> result<lat-value, parse-error>;
+    parse: func(inputs: string) -> result<lat-value, parse-error>;
 }
 
 interface types {

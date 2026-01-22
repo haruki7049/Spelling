@@ -6,7 +6,7 @@ use bevy_simple_text_input::{
     TextInput, TextInputPlugin, TextInputSubmitMessage, TextInputSystem, TextInputTextColor,
     TextInputTextFont,
 };
-use lat::{Guest, Lat};
+use lat::Lat;
 use clap::Parser as _;
 
 #[derive(clap::Parser)]
@@ -16,12 +16,35 @@ struct CLIArgs {
     wasm_path: Option<std::path::PathBuf>,
 }
 
-fn main() {
+struct WasmState();
+
+impl lat::haruki7049::lat::types::Host for WasmState {}
+
+#[derive(Resource)]
+struct LatContainer {
+    store: wasmtime::Store<WasmState>,
+    instance: lat::Lat,
+}
+
+fn main() -> anyhow::Result<()> {
     let args = CLIArgs::parse();
 
-    if args.wasm_path.is_none() {
-        panic!("WASM_PATH IS NONE");
-    }
+    let container: LatContainer = {
+        let engine = wasmtime::Engine::default();
+        let component = wasmtime::component::Component::from_file(&engine, &args.wasm_path.unwrap())?;
+
+        let mut linker = wasmtime::component::Linker::new(&engine);
+        lat::Lat::add_to_linker::<_, wasmtime::component::HasSelf<_>>(&mut linker, |state| state)?;
+
+        let mut store = wasmtime::Store::new(
+            &engine,
+            WasmState(),
+        );
+
+        let instance = Lat::instantiate(&mut store, &component, &linker)?;
+
+        LatContainer { store, instance }
+    };
 
     App::new()
         .add_plugins((
@@ -41,10 +64,10 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(Update, (listener.after(TextInputSystem), update_boundaries))
         .add_systems(Update, reset)
+        .insert_resource(container)
         .run();
-}
 
-fn load_lat_parse(path: std::path::PathBuf) -> wasmtime::compnent::TypedFunc<(String,), Result<lat::LatValue, lat::ParseError>> {
+    Ok(())
 }
 
 #[derive(Component)]
@@ -148,12 +171,22 @@ fn update_boundaries(windows: Query<&Window>, mut query: Query<&mut Collider, Wi
 fn listener(
     mut events: MessageReader<TextInputSubmitMessage>,
     mut resetter: MessageWriter<ResetMessage>,
+    mut container: ResMut<LatContainer>,
 ) {
     for event in events.read() {
-        if let Ok(result) = Lat::parse(event.value.clone())
-            && result.resetting
-        {
-            resetter.write(ResetMessage);
+        match container.instance.haruki7049_lat_parser().call_parse(&mut container.store, &event.value) {
+            Ok(Ok(result)) => {
+                if result.resetting {
+                    resetter.write(ResetMessage);
+                }
+            }
+
+            Ok(Err(e)) => {
+                error!("Parse error: {:?}", e);
+            }
+            Err(e) => {
+                error!("Wasm execution error: {:?}", e);
+            }
         }
     }
 }
