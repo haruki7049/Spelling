@@ -8,6 +8,9 @@ use bevy_simple_text_input::{
 };
 use lat::{Guest, Lat};
 
+#[derive(Component)]
+struct SandboxEntity;
+
 const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
 const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const BACKGROUND_COLOR: Color = Color::srgb(0.15, 0.15, 0.15);
@@ -27,8 +30,10 @@ fn main() {
         ))
         .add_plugins(TextInputPlugin)
         .insert_resource(Gravity(Vec2::NEG_Y * 981.0))
+        .init_resource::<Messages<ResetMessage>>()
         .add_systems(Startup, setup)
         .add_systems(Update, (listener.after(TextInputSystem), update_boundaries))
+        .add_systems(Update, reset)
         .run();
 }
 
@@ -82,6 +87,7 @@ fn setup(
         RigidBody::Static,
         Collider::polyline(vertices, None),
         Boundary,
+        SandboxEntity,
     ));
 
     // 2. Falling Ball
@@ -95,6 +101,7 @@ fn setup(
         Mass(1.0),
         Restitution::new(0.6), // Bounce
         Name::new("Ball"),
+        SandboxEntity,
     ));
 }
 
@@ -121,10 +128,63 @@ fn update_boundaries(windows: Query<&Window>, mut query: Query<&mut Collider, Wi
     }
 }
 
-fn listener(mut events: MessageReader<TextInputSubmitMessage>) {
+fn listener(
+    mut events: MessageReader<TextInputSubmitMessage>,
+    mut resetter: MessageWriter<ResetMessage>,
+) {
     for event in events.read() {
-        if let Ok(result) = Lat::parse(event.value.clone()) {
-            info!("result.resetting = {}", result.resetting);
+        if let Ok(result) = Lat::parse(event.value.clone()) && result.resetting {
+            resetter.write(ResetMessage);
         }
+    }
+}
+
+#[derive(Message)]
+struct ResetMessage;
+
+fn reset(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut resetter: MessageReader<ResetMessage>,
+    sandbox_entities: Query<Entity, With<SandboxEntity>>,
+) {
+    for _reset_msg in resetter.read() {
+        for entity in sandbox_entities.into_iter() {
+            commands.entity(entity).despawn();
+        }
+
+        // 1. Boundary (Walls/Floor)
+        // Define screen dimensions (example: 1280x720)
+        let w = 1280.0;
+        let h = 720.0;
+        let vertices = vec![
+            Vec2::new(-w, -h),
+            Vec2::new(w, -h),
+            Vec2::new(w, h),
+            Vec2::new(-w, h),
+            Vec2::new(-w, -h),
+        ];
+
+        commands.spawn((
+            RigidBody::Static,
+            Collider::polyline(vertices, None),
+            SandboxEntity,
+            Boundary,
+        ));
+
+        // 2. Falling Ball
+        let radius = 20.0;
+        commands.spawn((
+            Mesh2d(meshes.add(Circle::new(radius))),
+            MeshMaterial2d(materials.add(ColorMaterial::from_color(Color::srgb(1.0, 0.0, 0.0)))),
+            Transform::from_xyz(0.0, 0.0, 0.0),
+            RigidBody::Dynamic,
+            Collider::circle(radius),
+            Mass(1.0),
+            Restitution::new(0.6), // Bounce
+            Name::new("Ball"),
+            SandboxEntity,
+        ));
     }
 }
