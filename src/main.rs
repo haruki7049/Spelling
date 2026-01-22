@@ -173,8 +173,10 @@ fn listener(
     mut resetter: MessageWriter<ResetMessage>,
     mut container: ResMut<LatContainer>,
 ) {
+    let LatContainer { store, instance } = &mut *container;
+
     for event in events.read() {
-        match container.instance.haruki7049_lat_parser().call_parse(&mut container.store, &event.value) {
+        match instance.haruki7049_lat_parser().call_parse(&mut *store, &event.value) {
             Ok(Ok(result)) => {
                 if result.resetting {
                     resetter.write(ResetMessage);
