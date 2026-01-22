@@ -53,8 +53,7 @@ fn main() -> anyhow::Result<()> {
     let args = CLIArgs::parse();
 
     let container: LatContainer = {
-        let mut config = wasmtime::Config::default();
-
+        let config = wasmtime::Config::default();
         let engine = wasmtime::Engine::new(&config)?;
         let component =
             wasmtime::component::Component::from_file(&engine, args.wasm_path.unwrap())?;
