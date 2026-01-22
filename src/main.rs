@@ -26,26 +26,26 @@ fn setup(mut commands: Commands) {
         .spawn(Node {
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
+            justify_content: JustifyContent::SpaceBetween,
+            align_items: AlignItems::Start,
+            padding: UiRect::all(Val::Px(5.0)),
             ..default()
         })
         .with_children(|parent| {
             parent.spawn((
                 Node {
-                    width: Val::Px(200.0),
                     border: UiRect::all(Val::Px(5.0)),
                     padding: UiRect::all(Val::Px(5.0)),
                     ..default()
                 },
-                BorderColor::all(BORDER_COLOR_ACTIVE),
-                BackgroundColor(BACKGROUND_COLOR),
                 TextInput,
                 TextInputTextFont(TextFont {
                     font_size: 34.,
                     ..default()
                 }),
                 TextInputTextColor(TextColor(TEXT_COLOR)),
+                BorderColor::all(BORDER_COLOR_ACTIVE),
+                BackgroundColor(BACKGROUND_COLOR),
             ));
         });
 }
