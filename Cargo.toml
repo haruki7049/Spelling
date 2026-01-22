@@ -27,8 +27,8 @@ members = [
   "crates/game/plugins/crates/commons",
   "crates/game/plugins/crates/shooting_range_plugin",
   "crates/lat",
-  "crates/lat/example-implementations/only-reset",
 ]
+exclude = ["crates/lat/example-implementations/only-reset"]
 
 [workspace.dependencies]
 lat.path = "crates/lat"
