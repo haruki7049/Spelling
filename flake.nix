@@ -63,28 +63,20 @@
               pkgs.llvmPackages.libclang.lib
             ];
           nativeBuildInputs = [
-            # Build tools
+            # Compiler & Tools for Wasm & Nix drv
+            rust
             pkgs.pkg-config
+            pkgs.wasm-tools
             pkgs.makeWrapper
 
-            # Rust
-            rust
-
-            # Nix
+            # LSP
             pkgs.nil
-
-            # Linker
-            pkgs.llvmPackages.clang
-            pkgs.llvmPackages.lld
 
             # Cachix
             pkgs.cachix
 
             # Script runner
             pkgs.nushell
-
-            # Wasm
-            pkgs.wasm-tools
           ];
           cargoArtifacts = craneLib.buildDepsOnly {
             inherit src buildInputs nativeBuildInputs;
