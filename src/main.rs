@@ -40,7 +40,7 @@ impl Default for WasmState {
     }
 }
 
-impl lat::haruki7049::lat::types::Host for WasmState {}
+impl lat::types::Host for WasmState {}
 
 struct LatContainer {
     store: wasmtime::Store<WasmState>,

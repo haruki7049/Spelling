@@ -12,4 +12,4 @@ impl bevy::ecs::component::Component for Lat {
         bevy::ecs::component::StorageType::Table;
 }
 
-pub use haruki7049::lat::types::{LatValue, ParseError};
+pub use haruki7049::lat::types;
