@@ -11,7 +11,7 @@ use lat::Lat;
 #[command(about, author, version)]
 struct CLIArgs {
     #[arg(long)]
-    wasm_path: Option<std::path::PathBuf>,
+    wasm_path: std::path::PathBuf,
 }
 
 struct WasmState {
@@ -54,7 +54,7 @@ fn main() -> anyhow::Result<()> {
         let config = wasmtime::Config::default();
         let engine = wasmtime::Engine::new(&config)?;
         let component =
-            wasmtime::component::Component::from_file(&engine, args.wasm_path.unwrap())?;
+            wasmtime::component::Component::from_file(&engine, args.wasm_path)?;
 
         let mut linker = wasmtime::component::Linker::new(&engine);
         wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
