@@ -1,5 +1,3 @@
-//! An example showing a very basic implementation.
-
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_simple_text_input::{
