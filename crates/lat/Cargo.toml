@@ -13,9 +13,6 @@ readme.workspace = true
 wasmtime.workspace = true
 bevy.workspace = true
 
-[lib]
-crate-type = ["rlib", "cdylib"]
-
 [package.metadata.component]
 package = "haruki7049:lat"
 
