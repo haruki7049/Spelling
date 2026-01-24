@@ -2,7 +2,7 @@
 //!
 //! ## WIT (Wasm Interface Type)
 //!
-//! ```
+//! ```wit
 #![doc = include_str!("../crates/lat/wit/lat.wit")]
 //! ```
 
