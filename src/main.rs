@@ -1,3 +1,11 @@
+//! # Spelling
+//!
+//! ## WIT (Wasm Interface Type)
+//!
+//! ```
+#![doc = include_str!("../crates/lat/wit/lat.wit")]
+//! ```
+
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_simple_text_input::{
