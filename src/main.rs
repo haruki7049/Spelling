@@ -53,8 +53,7 @@ fn main() -> anyhow::Result<()> {
     let container: LatContainer = {
         let config = wasmtime::Config::default();
         let engine = wasmtime::Engine::new(&config)?;
-        let component =
-            wasmtime::component::Component::from_file(&engine, args.wasm_path)?;
+        let component = wasmtime::component::Component::from_file(&engine, args.wasm_path)?;
 
         let mut linker = wasmtime::component::Linker::new(&engine);
         wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
