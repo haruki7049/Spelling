@@ -14,6 +14,18 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
+	if g.scene == nil {
+		return nil
+	}
+
+	next, err := g.scene.Update()
+	if err != nil {
+		return err
+	}
+	if next != nil {
+		g.scene = next
+	}
+
 	return nil
 }
 
