@@ -1,4 +1,11 @@
 {
+  nixConfig = {
+    extra-substituters = [ "https://haruki7049.cachix.org" ];
+    extra-trusted-public-keys = [
+      "haruki7049.cachix.org-1:Hd6hnIsYnpDDNhg/ZX06QkLBaCgDoatgNPqrFnUqhMk="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-compat.url = "github:edolstra/flake-compat";
