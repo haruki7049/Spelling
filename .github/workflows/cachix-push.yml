@@ -3,7 +3,7 @@ name: "cachix-push"
 on:
   push:
     branches:
-      - "master"
+      - "main"
     tags:
       - '*'
 
