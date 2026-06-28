@@ -1,8 +1,12 @@
 package game
 
 import (
+	"github.com/hajimehoshi/bitmapfont/v4"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
+
+var fontFace = text.NewGoXFace(bitmapfont.Face)
 
 const WINDOW_WIDTH = 1280
 const WINDOW_HEIGHT = 720
@@ -15,7 +19,7 @@ type Game struct {
 
 func (g *Game) Update() error {
 	if g.scene == nil {
-		return nil
+		g.scene = NewExampleScene()
 	}
 
 	next, err := g.scene.Update()
