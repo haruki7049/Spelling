@@ -1,15 +1,6 @@
 {
-  nixConfig = {
-    extra-substituters = [ "https://spelling.cachix.org" ];
-    extra-trusted-public-keys = [
-      "spelling.cachix.org-1:eHw0At75VldK+6XF499P/MqOeM2ARf+ladQK3dEOsFY="
-    ];
-  };
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
-    crane.url = "github:ipetkov/crane";
     flake-compat.url = "github:edolstra/flake-compat";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -19,8 +10,8 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
+    gomod2nix = {
+      url = "github:nix-community/gomod2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -28,7 +19,11 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
 
       imports = [
         inputs.treefmt-nix.flakeModule
@@ -36,106 +31,40 @@
 
       perSystem =
         {
-          pkgs,
+          config,
           lib,
+          pkgs,
           system,
           ...
         }:
         let
-          rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-          craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rust;
-          overlays = [ inputs.rust-overlay.overlays.default ];
-          src = lib.cleanSource ./.;
-          buildInputs =
-            lib.optionals pkgs.stdenv.isLinux [
-              pkgs.pkg-config
-              pkgs.udev
-              pkgs.alsa-lib
-              pkgs.vulkan-loader
-              pkgs.xorg.libX11
-              pkgs.xorg.libXcursor
-              pkgs.xorg.libXi
-              pkgs.xorg.libXrandr
-              pkgs.libxkbcommon
-              pkgs.wayland
-            ]
-            ++ [
-              pkgs.llvmPackages.libclang.lib
-            ];
-          nativeBuildInputs = [
-            # Compiler & Tools for Wasm & Nix drv
-            rust
-            pkgs.pkg-config
-            pkgs.wasm-tools
-            pkgs.makeWrapper
+          overlays = [ inputs.gomod2nix.overlays.default ];
+          buildInputs = lib.optionals pkgs.stdenv.isLinux [
+            # Build-time dependencies
+            pkgs.libx11
+            pkgs.libxrandr
+            pkgs.libxcursor
+            pkgs.libxinerama
+            pkgs.libxi
+            pkgs.libxxf86vm
+            pkgs.alsa-lib
 
-            # LSP
-            pkgs.nil
-
-            # Cachix
-            pkgs.cachix
-
-            # Script runner
-            pkgs.nushell
+            # Runtime dependencies
+            pkgs.libGL
           ];
-          cargoArtifacts = craneLib.buildDepsOnly {
-            inherit src buildInputs nativeBuildInputs;
+          nativeBuildInputs = [
+            pkgs.go # Golang
+            pkgs.pkg-config # pkg-config
+            pkgs.nil # Nix LSP
+            pkgs.gopls # Golang LSP
+            pkgs.gomod2nix # gomod2nix for creating Hashes (./gomod2nix.toml)
+          ];
 
-            LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
-            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
-          };
-          spelling = craneLib.buildPackage {
-            inherit
-              src
-              cargoArtifacts
-              buildInputs
-              nativeBuildInputs
-              ;
-            strictDeps = true;
-            doCheck = true;
-
-            LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
-            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
-
-            installPhaseCommand = ''
-              echo "actually installing contents of $postBuildInstallFromCargoBuildLogOut to $out"
-              mkdir -p $out
-              find "$postBuildInstallFromCargoBuildLogOut" -mindepth 1 -maxdepth 1 | xargs -r mv -t $out
-
-              echo "Copy assets"
-              cp -r assets $out/bin
-
-              wrapProgram $out/bin/spelling \
-                --set LD_LIBRARY_PATH ${lib.makeLibraryPath buildInputs}
-            '';
-
-            meta = {
-              licenses = [ lib.licenses.mit ];
-              mainProgram = "spelling";
-            };
-          };
-          cargo-clippy = craneLib.cargoClippy {
-            inherit
-              src
-              cargoArtifacts
-              buildInputs
-              nativeBuildInputs
-              ;
-            cargoClippyExtraArgs = "--verbose -- --deny warnings";
-
-            LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
-            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
-          };
-          cargo-doc = craneLib.cargoDoc {
-            inherit
-              src
-              cargoArtifacts
-              buildInputs
-              nativeBuildInputs
-              ;
-
-            LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
-            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
+          spelling = pkgs.buildGoApplication {
+            name = "spelling";
+            src = lib.cleanSource ./.;
+            modules = ./gomod2nix.toml;
+            inherit buildInputs nativeBuildInputs;
           };
         in
         {
@@ -144,17 +73,13 @@
           };
 
           treefmt = {
-            projectRootFile = "flake.nix";
+            projectRootFile = ".git/config";
 
             # Nix
             programs.nixfmt.enable = true;
 
-            # Rust
-            programs.rustfmt.enable = true;
-            settings.formatter.rustfmt.command = "${rust}/bin/rustfmt";
-
-            # TOML
-            programs.taplo.enable = true;
+            # Go
+            programs.gofmt.enable = true;
 
             # GitHub Actions
             programs.actionlint.enable = true;
@@ -170,22 +95,17 @@
           packages = {
             inherit spelling;
             default = spelling;
-            doc = cargo-doc;
           };
 
           checks = {
-            inherit cargo-clippy;
+            inherit spelling;
           };
 
           devShells.default = pkgs.mkShell {
             inherit buildInputs nativeBuildInputs;
 
-            LIBCLANG_PATH = lib.makeLibraryPath buildInputs;
-            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
-
-            shellHook = ''
-              export PS1="\n[nix-shell:\w]$ "
-            '';
+            env.LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
+            inputsFrom = [ config.treefmt.build.devShell ];
           };
         };
     };
