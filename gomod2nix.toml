@@ -13,9 +13,25 @@ schema = 3
     version = 'v0.11.0-alpha.5'
     hash = 'sha256-pX1LjO8uga0nZUX7qDddfK3kKpTdIZS0L/AH10eTxpM='
 
+  [mod.'github.com/go-text/typesetting']
+    version = 'v0.3.5-0.20260505125104-04e4e76f9371'
+    hash = 'sha256-szf7fpjvdbQVmfqZscCImqdTRLuTqbs52U2xZEBOVpU='
+
+  [mod.'github.com/hajimehoshi/bitmapfont/v4']
+    version = 'v4.1.1'
+    hash = 'sha256-onPsjCVXkqocxomDU8iIcouCpuEe/9VOsW94wVQBcZM='
+
   [mod.'github.com/hajimehoshi/ebiten/v2']
     version = 'v2.10.0-alpha.11.0.20260627153341-7f2b87e9c97c'
     hash = 'sha256-tYfzUknDhkVN85fkIGW3PdbHcRx5JaRpBgRHT/uDrhQ='
+
+  [mod.'github.com/pierrec/lz4/v4']
+    version = 'v4.1.22'
+    hash = 'sha256-mxO2jXM6O2yzZjkJeck+C8ncLZs/5EGoMQU1yQh/row='
+
+  [mod.'golang.org/x/image']
+    version = 'v0.43.0'
+    hash = 'sha256-GKd2YyREOkKGh4xfpgOo9eOc1gzzMRXrIEH1SmJ2688='
 
   [mod.'golang.org/x/sync']
     version = 'v0.21.0'
@@ -24,3 +40,7 @@ schema = 3
   [mod.'golang.org/x/sys']
     version = 'v0.46.0'
     hash = 'sha256-NzRXMSEk6upeudJvUEPVnw6clJ3d8UdC/vdfANWAc8g='
+
+  [mod.'golang.org/x/text']
+    version = 'v0.38.0'
+    hash = 'sha256-PzREcn7yzTAJ0WBvyYL/2/r+tfoeKTY/E5HVXi/CJsU='
