@@ -66,6 +66,7 @@
             pkgs.gopls # Golang LSP
             pkgs.gomod2nix # gomod2nix for creating Hashes (./gomod2nix.toml)
             pkgs.cachix # cachix CLI
+            pkgs.nushell # Script Runner
           ];
 
           spelling = pkgs.buildGoApplication {
