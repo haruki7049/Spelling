@@ -12,10 +12,10 @@ nix flake archive --json
   | [ ($in | get path), ($in | get inputs | values | get path) ]
   | flatten
   | str join (char nl)
-  | cachix push spelling
+  | cachix push haruki7049
 
 print "Pushing runtime closure..."
 print
 
 nix build --no-link --print-out-paths .#spelling
-  | cachix push spelling
+  | cachix push haruki7049
