@@ -10,6 +10,11 @@ var (
 		{Name: "Myself", Pattern: "watashi"},
 		{Name: "RightDirection", Pattern: "migi"},
 		{Name: "LeftDirection", Pattern: "hidari"},
+		{Name: "Move", Pattern: "ugoku"},
+
+		{Name: "Topic", Pattern: "ha"},
+		{Name: "Direction", Pattern: "ni"},
+
 		{Name: "EOL", Pattern: `[\n\r]+`},
 		{Name: "Whitespace", Pattern: `[ \t]+`},
 	})
@@ -30,11 +35,10 @@ func Parse(text string) (*NogitAST, error) {
 }
 
 type NogitAST struct {
-	Noun *Noun `parser:"@@"`
+	Words []*Word `parser:"@@*"`
 }
 
-type Noun struct {
-	Myself         *string `parser:"@Myself"`
-	RightDirection *string `parser:"@RightDirection"`
-	LeftDirection  *string `parser:"@LeftDirection"`
+type Word struct {
+	Noun        string `parser:"@(Myself | RightDirection | LeftDirection | Move) |"`
+	Grammatical string `parser:"@(Topic | Direction)"`
 }
