@@ -58,11 +58,11 @@ func TestParse(t *testing.T) {
 
 		expected := &NogitAST{
 			Words: []*Word{
-				&Word{Noun: "watashi"},
-				&Word{Grammatical: "ha"},
-				&Word{Noun: "hidari"},
-				&Word{Grammatical: "ni"},
-				&Word{Noun: "ugoku"},
+				{Noun: "watashi"},
+				{Grammatical: "ha"},
+				{Noun: "hidari"},
+				{Grammatical: "ni"},
+				{Noun: "ugoku"},
 			},
 		}
 
@@ -70,17 +70,19 @@ func TestParse(t *testing.T) {
 			t.Errorf("The expected words' len is %d, but got %d", len(expected.Words), len(actual.Words))
 		}
 
-		for i, _ := range expected.Words {
+		for i := range expected.Words {
 			expectedWord := expected.Words[i]
 			actualWord := actual.Words[i]
 
-			if expectedWord != actualWord {
-				t.Errorf("Expected %#v, but got %#v", expectedWord, actualWord)
+			if expectedWord.Grammatical != "" {
+				if expectedWord.Grammatical != actualWord.Grammatical {
+					t.Errorf("Expected %#v, but got %#v", expectedWord.Grammatical, actualWord.Grammatical)
+				}
+			} else {
+				if expectedWord.Noun != actualWord.Noun {
+					t.Errorf("Expected %#v, but got %#v", expectedWord.Noun, actualWord.Noun)
+				}
 			}
-		}
-
-		if expected != actual {
-			t.Errorf("Expected %#v, but got %#v", expected, actual)
 		}
 	}
 }
