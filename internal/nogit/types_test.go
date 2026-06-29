@@ -4,45 +4,21 @@ import (
 	"testing"
 )
 
+func testParseFromText(t *testing.T, text string) {
+	result, err := Parse(text)
+	if err != nil {
+		t.Errorf("An error invoked from Parse func: %v", err)
+	}
+
+	if result == nil {
+		t.Error("The result by Parse func is nil")
+	}
+}
+
 func TestParse(t *testing.T) {
-	{
-		text := "watashi migi hidari"
-		result, err := Parse(text)
-
-		if err != nil {
-			t.Errorf("An error invoked from Parse func: %v", err)
-		}
-
-		if result == nil {
-			t.Error("The result by Parse func is nil")
-		}
-	}
-
-	{
-		text := "watashi ha migi ni"
-		result, err := Parse(text)
-
-		if err != nil {
-			t.Errorf("An error invoked from Parse func: %v", err)
-		}
-
-		if result == nil {
-			t.Error("The result by Parse func is nil")
-		}
-	}
-
-	{
-		text := "watashi ha hidari ni ugoku"
-		result, err := Parse(text)
-
-		if err != nil {
-			t.Errorf("An error invoked from Parse func: %v", err)
-		}
-
-		if result == nil {
-			t.Error("The result by Parse func is nil")
-		}
-	}
+	testParseFromText(t, "watashi migi hidari")
+	testParseFromText(t, "watashi ha migi ni")
+	testParseFromText(t, "watashi ha hidari ni ugoku")
 
 	{
 		text := "watashihahidariniugoku"
