@@ -3,6 +3,7 @@ module github.com/haruki7049/spelling
 go 1.26.3
 
 require (
+	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/hajimehoshi/bitmapfont/v4 v4.1.1
 	github.com/hajimehoshi/ebiten/v2 v2.10.0-alpha.11.0.20260627153341-7f2b87e9c97c
 )
