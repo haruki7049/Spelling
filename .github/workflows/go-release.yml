@@ -58,7 +58,7 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
-        run: go build -trimpath -ldflags="-s -w" -o ${{ matrix.output }} main.go
+        run: go build -trimpath -ldflags="-s -w" -o ${{ matrix.output }} ./cmd/spelling
 
       # Upload the built binary to GitHub Releases
       - name: Release
