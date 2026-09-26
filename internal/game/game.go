@@ -1,12 +1,6 @@
 package game
 
-import (
-	"github.com/hajimehoshi/bitmapfont/v4"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
-)
-
-var fontFace = text.NewGoXFace(bitmapfont.Face)
+import "github.com/hajimehoshi/ebiten/v2"
 
 const WINDOW_WIDTH = 1280
 const WINDOW_HEIGHT = 720

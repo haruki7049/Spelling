@@ -8,7 +8,7 @@ import (
 type ExampleScene struct{}
 
 func NewExampleScene() *ExampleScene {
-	return nil
+	return &ExampleScene{}
 }
 
 func (s *ExampleScene) Update() (Scene, error) {
