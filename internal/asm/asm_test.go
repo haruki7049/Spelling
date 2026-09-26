@@ -163,3 +163,17 @@ func TestAssembleEmpty(t *testing.T) {
 		t.Errorf("got %v, %v; want no code", code, err)
 	}
 }
+
+// FuzzAssemble checks that arbitrary input, which may come from RAM the
+// opponent can write, never panics and never yields code with an error.
+func FuzzAssemble(f *testing.F) {
+	f.Add("li a0, 0; li t0, 10; loop: add a0, a0, t0; addi t0, t0, -1; bnez t0, loop")
+	f.Add("la a1, x; call x; x: lw a0, -4(a1); fence rw, rw; jalr ra, a0, 0; ret")
+	f.Add("a: b: j a # c\n\tsb x1, (x2)")
+	f.Fuzz(func(t *testing.T, src string) {
+		code, err := Assemble(src, 0x200)
+		if err != nil && code != nil {
+			t.Errorf("got both code and error %v", err)
+		}
+	})
+}
