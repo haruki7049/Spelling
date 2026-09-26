@@ -11,8 +11,7 @@ ______________________________________________________________________
 - **Development Environment**: Managed with Nix (`flake.nix`, `flake-parts`), `direnv` (`.envrc`), and `treefmt-nix` for formatting Nix, Go, GitHub Actions, Markdown, and shell scripts. `go`, `gomod2nix`, and `treefmt` are available on `PATH` inside `nix develop` (or via direnv).
 - **Target Language Version**: Go as declared by the `go` directive in `go.mod`. Go module dependencies are pinned for Nix in `gomod2nix.toml`, which must be kept in sync with `go.mod`/`go.sum`.
 - **Directory Structure**:
-  - `main.go`: Application entry point (window setup and `ebiten.RunGame`).
-  - `cmd/spelling/spelling.go`: Alternative entry point for `go install`/`go run ./cmd/spelling`.
+  - `cmd/spelling/spelling.go`: Application entry point (window setup and `ebiten.RunGame`). Run with `go run ./cmd/spelling`.
   - `internal/game/`: Game logic (`game.go`: `Game` type and window constants, `scene.go`: scene abstraction, `example_scene.go`: sample scene).
   - `flake.nix`, `default.nix`, `shell.nix`: Nix package (`buildGoApplication` via `gomod2nix`), devShell, treefmt config, and flake-compat shims.
   - `scripts/push-artifacts-to-cachix.nu`: Nushell script used by the Cachix workflow.
