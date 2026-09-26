@@ -37,8 +37,14 @@ func TestAssembleEncoding(t *testing.T) {
 		{"li a0, 0xffffffff", []uint32{0xfff00513}},
 		{"li a0, 0x12345678", []uint32{0x12345537, 0x67850513}},
 		{"li a0, 0x800", []uint32{0x00001537, 0x80050513}},
-		{"li a0, 0x1000_2008", []uint32{0x10002537, 0x00850513}},
-		{"ADDI A0, ZERO, 1", []uint32{0x00100513}},
+		{"li a0, 0x10002008", []uint32{0x10002537, 0x00850513}},
+		{"li a0, 0x1000", []uint32{0x00001537}},
+		{"li a0, 0x80000000", []uint32{0x80000537}},
+		{"fence rw, rw", []uint32{0x0330000f}},
+		{"fence r, w", []uint32{0x0210000f}},
+		{"ADDI a0, zero, 1", []uint32{0x00100513}},
+		{"beq a0, a1, -4096", []uint32{0x80b50063}},
+		{"jal t0, 1048574", []uint32{0x7ffff2ef}},
 		{"top: j top", []uint32{0x0000006f}},
 		{"nop; nop # comment; not a statement", []uint32{0x13, 0x13}},
 	}
@@ -135,6 +141,12 @@ func TestAssembleErrors(t *testing.T) {
 		{"li a0, 0x100000000", 1, "out of range"},
 		{"la a0, 16", 1, "want a label"},
 		{"ret a0", 1, "want 0 operands"},
+		{"li a0, 0x1000_2008", 1, "invalid integer"},
+		{"li a0, 0o17", 1, "invalid integer"},
+		{"addi A0, zero, 1", 1, "invalid register"},
+		{"call 8", 1, "want a label"},
+		{"fence wr, rw", 1, "subset of iorw"},
+		{"fence rw", 1, "want 0 or 2 operands"},
 	}
 	for _, tt := range tests {
 		_, err := Assemble(tt.src, 0)

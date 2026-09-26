@@ -1,6 +1,9 @@
 package asm
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Opcodes of the RV32I base instruction set.
 const (
@@ -67,7 +70,7 @@ func init() {
 		"or":   aluReg(0b110, 0),
 		"and":  aluReg(0b111, 0),
 
-		"fence":  fixed(0x0ff0000f),
+		"fence":  encFence,
 		"ecall":  fixed(0x00000073),
 		"ebreak": fixed(0x00100073),
 
@@ -153,10 +156,8 @@ func pcOffset(arg string, pc uint32, labels map[string]uint32, bits uint) (int64
 
 func fixed(inst uint32) encoder {
 	return func(s statement, _ map[string]uint32) ([]uint32, error) {
-		if s.mnemonic != "fence" {
-			if err := wantArgs(s, 0); err != nil {
-				return nil, err
-			}
+		if err := wantArgs(s, 0); err != nil {
+			return nil, err
 		}
 		return []uint32{inst}, nil
 	}
@@ -352,6 +353,9 @@ func encLI(s statement, _ map[string]uint32) ([]uint32, error) {
 		return []uint32{encI(int64(int32(v)), 0, 0b000, rd, opImm)}, nil
 	}
 	hi, lo := splitHiLo(uint32(v))
+	if lo == 0 {
+		return []uint32{encU(hi, rd, opLUI)}, nil
+	}
 	return []uint32{
 		encU(hi, rd, opLUI),
 		encI(lo, rd, 0b000, rd, opImm),
@@ -384,6 +388,9 @@ func encCall(s statement, labels map[string]uint32) ([]uint32, error) {
 	if err := wantArgs(s, 1); err != nil {
 		return nil, err
 	}
+	if !isIdent(s.args[0]) {
+		return nil, fmt.Errorf("call: want a label, got %q", s.args[0])
+	}
 	off, err := target(s.args[0], s.addr, labels)
 	if err != nil {
 		return nil, err
@@ -415,4 +422,39 @@ func encJ(s statement, labels map[string]uint32) ([]uint32, error) {
 		return nil, err
 	}
 	return []uint32{encJType(off, 0)}, nil
+}
+
+// encFence encodes "fence" (same as "fence iorw, iorw") or "fence pred, succ",
+// where pred and succ are non-empty subsets of "iorw" in that order.
+func encFence(s statement, _ map[string]uint32) ([]uint32, error) {
+	switch len(s.args) {
+	case 0:
+		return []uint32{0x0ff0000f}, nil
+	case 2:
+		pred, err := fenceSet(s.args[0])
+		if err != nil {
+			return nil, err
+		}
+		succ, err := fenceSet(s.args[1])
+		if err != nil {
+			return nil, err
+		}
+		return []uint32{pred<<24 | succ<<20 | opMiscMem}, nil
+	}
+	return nil, fmt.Errorf("fence: want 0 or 2 operands, got %d", len(s.args))
+}
+
+func fenceSet(arg string) (uint32, error) {
+	var bits uint32
+	rest := arg
+	for i, c := range "iorw" {
+		if r, ok := strings.CutPrefix(rest, string(c)); ok {
+			bits |= 1 << (3 - i)
+			rest = r
+		}
+	}
+	if bits == 0 || rest != "" {
+		return 0, fmt.Errorf("fence: invalid operand %q, want a subset of iorw", arg)
+	}
+	return bits, nil
 }

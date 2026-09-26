@@ -5,12 +5,17 @@
 //   - One instruction per statement. Statements are separated by newlines
 //     or ';'. '#' starts a comment that runs to the end of the line.
 //   - A statement may start with one or more labels ("loop:").
-//   - Registers use numeric (x0-x31) or ABI names (zero, ra, sp, a0, ...).
-//   - Integers are decimal, 0x hex, 0o octal, or 0b binary, optionally
-//     negative, and may contain '_' separators after a base prefix.
+//   - Mnemonics are case-insensitive. Registers are lowercase numeric
+//     (x0-x31) or ABI names (zero, ra, sp, a0, ...).
+//   - Integers are decimal, 0x hex, 0b binary, or 0-prefixed octal,
+//     optionally negative.
 //   - Loads, stores, and jalr take "offset(reg)" memory operands.
 //   - Branch and jump targets are a label or an integer byte offset from
-//     the instruction.
+//     the instruction. la and call take a label only.
+//   - fence takes no operands or "pred, succ" (subsets of iorw).
+//
+// Anything accepted here is also accepted by LLVM's RISC-V assembler with
+// the same meaning, so typed code can be moved to an external toolchain.
 //   - Pseudo-instructions: nop, li, la, mv, j, call, ret, beqz, bnez.
 //
 // Directives (.section, .word, ...) and relocations are not supported;
@@ -120,7 +125,7 @@ func size(s statement) (uint32, error) {
 		if err != nil {
 			return 0, err
 		}
-		if fitsSigned(int64(int32(v)), 12) {
+		if _, lo := splitHiLo(uint32(v)); fitsSigned(int64(int32(v)), 12) || lo == 0 {
 			return 1, nil
 		}
 		return 2, nil
@@ -157,7 +162,6 @@ var abiNames = map[string]uint32{
 }
 
 func parseReg(s string) (uint32, error) {
-	s = strings.ToLower(s)
 	if r, ok := abiNames[s]; ok {
 		return r, nil
 	}
@@ -171,6 +175,11 @@ func parseReg(s string) (uint32, error) {
 
 // parseImm parses an integer in [lo, hi].
 func parseImm(s string, lo, hi int64) (int64, error) {
+	// strconv also accepts '_' separators and 0o octal, which LLVM rejects.
+	digits := strings.TrimPrefix(s, "-")
+	if strings.Contains(s, "_") || strings.HasPrefix(digits, "0o") || strings.HasPrefix(digits, "0O") {
+		return 0, fmt.Errorf("invalid integer %q", s)
+	}
 	v, err := strconv.ParseInt(s, 0, 64)
 	if err != nil {
 		return 0, fmt.Errorf("invalid integer %q", s)
