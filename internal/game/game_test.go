@@ -1,0 +1,69 @@
+package game
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
+
+// stubScene returns next and err from Update and counts how often it is updated.
+type stubScene struct {
+	next    Scene
+	err     error
+	updates int
+}
+
+func (s *stubScene) Update() (Scene, error) {
+	s.updates++
+	return s.next, s.err
+}
+
+func (s *stubScene) Draw(screen *ebiten.Image) {}
+
+func TestUpdateStaysOnSceneWhenNextIsNil(t *testing.T) {
+	scene := &stubScene{}
+	g := NewGame(scene)
+
+	if err := g.Update(); err != nil {
+		t.Fatalf("Update() returned error: %v", err)
+	}
+	if g.scene != scene {
+		t.Errorf("scene changed, want it to stay on the initial scene")
+	}
+	if scene.updates != 1 {
+		t.Errorf("scene updated %d times, want 1", scene.updates)
+	}
+}
+
+func TestUpdateSwitchesToNextScene(t *testing.T) {
+	next := &stubScene{}
+	g := NewGame(&stubScene{next: next})
+
+	if err := g.Update(); err != nil {
+		t.Fatalf("Update() returned error: %v", err)
+	}
+	if g.scene != next {
+		t.Errorf("scene did not switch to the next scene")
+	}
+}
+
+func TestUpdateReturnsSceneError(t *testing.T) {
+	want := errors.New("boom")
+	scene := &stubScene{next: &stubScene{}, err: want}
+	g := NewGame(scene)
+
+	if err := g.Update(); !errors.Is(err, want) {
+		t.Fatalf("Update() error = %v, want %v", err, want)
+	}
+	if g.scene != scene {
+		t.Errorf("scene switched despite an error")
+	}
+}
+
+func TestLayoutReturnsFixedScreenSize(t *testing.T) {
+	w, h := NewGame(&stubScene{}).Layout(1920, 1080)
+	if w != WindowWidth || h != WindowHeight {
+		t.Errorf("Layout() = (%d, %d), want (%d, %d)", w, h, WindowWidth, WindowHeight)
+	}
+}
