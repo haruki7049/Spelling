@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(game.WINDOW_WIDTH, game.WINDOW_HEIGHT)
+	ebiten.SetWindowSize(game.WindowWidth, game.WindowHeight)
 	ebiten.SetWindowTitle("Spelling")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeDisabled)
 
-	if err := ebiten.RunGame(&game.Game{}); err != nil {
+	if err := ebiten.RunGame(game.NewGame(game.NewExampleScene())); err != nil {
 		log.Fatal(err)
 	}
 }
